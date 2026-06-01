@@ -21,7 +21,6 @@ export const DEFAULT_SUBJECTS: Subject[] = [
 
   // Muatan Lokal
   { id: 'aswaja', name: "Ke-NU-an / Aswaja", code: "NU", category: 'Muatan Lokal' },
-  { id: 'jawa', name: "Bahasa Jawa", code: "BAJ", category: 'Muatan Lokal' },
   { id: 'sunda', name: "Bahasa Sunda", code: "SNDY", category: 'Muatan Lokal' },
   { id: 'btq', name: "Baca Tulis Al-Qur'an (BTQ)", code: "BTQ", category: 'Muatan Lokal' },
   { id: 'tik', name: "Teknologi Informasi & Komunikasi (TIK)", code: "TIK", category: 'Muatan Lokal' }
@@ -36,13 +35,13 @@ export const DEFAULT_FORMULA: FormulaConfig = {
 export const DEFAULT_SCHOOL_INFO: SchoolInfo = {
   name: "MTs KHUDNUR",
   nsm: "121235150002",
-  npsn: "20584321",
-  address: "Jl. KH. Chudlori No. 24, Bululawang",
-  headmaster: "Drs. H. M. Nursalim, M.Pd.I",
-  headmasterNip: "197103122005011002",
-  subdistrict: "Bululawang",
-  city: "Kabupaten Malang",
-  province: "Jawa Timur"
+  npsn: "69983236",
+  address: "Komplek Pesantren Cidolog",
+  headmaster: "Ayi Ramli,S.Pd.I",
+  headmasterNip: "-",
+  subdistrict: "Tamansari",
+  city: "Kota Tasikmalaya",
+  province: "Jawa Barat"
 };
 
 // Generates uniform mock grades for setup testing
