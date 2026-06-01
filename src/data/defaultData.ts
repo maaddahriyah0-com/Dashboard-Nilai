@@ -33,8 +33,8 @@ export const DEFAULT_FORMULA: FormulaConfig = {
 };
 
 export const DEFAULT_SCHOOL_INFO: SchoolInfo = {
-  name: "MTs KHUDNUR",
-  nsm: "121235150002",
+  name: "MTs KHUD-NUR",
+  nsm: "121232780052",
   npsn: "69983236",
   address: "Komplek Pesantren Cidolog",
   headmaster: "Ayi Ramli,S.Pd.I",
