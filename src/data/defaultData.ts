@@ -1,4 +1,5 @@
 import { Subject, FormulaConfig, SchoolInfo, Student } from '../types';
+
 export const DEFAULT_SUBJECTS: Subject[] = [
   // Kelompok A (Umum)
   { id: 'qurdis', name: "Al-Qur'an Hadis", code: "QH", category: 'Kelompok A (Umum)' },
