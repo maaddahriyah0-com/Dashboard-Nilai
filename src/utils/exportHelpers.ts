@@ -143,15 +143,17 @@ export const exportIndividualPDF = (
   const xLeft = 14;
   let currentY = 15;
 
-  // Header Madrasah (Kop Surat)
-  doc.setFont('times', 'bold');
-  doc.setFontSize(14);
-  doc.text(schoolInfo.name.toUpperCase(), 105, currentY, { align: 'center' });
-  currentY += 6;
-  
-  doc.setFontSize(16);
-  doc.text(schoolInfo.name.toUpperCase(), 105, currentY, { align: 'center' });
-  currentY += 5;
+  // GANTI SEPANJANG BLOK INI (Baris 146 - 156):
+
+// Header Madrasah (Kop Surat)
+doc.setFont('times', 'bold');
+doc.setFontSize(14);
+doc.text("YAYASAN PONDOK PESANTREN MIFTAHUL IHSAN AL-MUSRI", 105, currentY, { align: 'center' }); // Ketik Nama Yayasan Anda di sini
+currentY += 6;
+
+doc.setFontSize(16);
+doc.text(schoolInfo.name.toUpperCase(), 105, currentY, { align: 'center' }); // Nama Madrasah otomatis dari pengaturan
+currentY += 5;
   
   doc.setFont('times', 'normal');
   doc.setFontSize(10);
