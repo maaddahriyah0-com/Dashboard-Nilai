@@ -143,8 +143,6 @@ export const exportIndividualPDF = (
   const xLeft = 14;
   let currentY = 15;
 
-  // GANTI SEPANJANG BLOK INI (Baris 146 - 156):
-
 // Header Madrasah (Kop Surat)
 doc.setFont('times', 'bold');
 doc.setFontSize(14);
