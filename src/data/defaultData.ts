@@ -1,5 +1,4 @@
 import { Subject, FormulaConfig, SchoolInfo, Student } from '../types';
-
 export const DEFAULT_SUBJECTS: Subject[] = [
   // Kelompok A (Umum)
   { id: 'qurdis', name: "Al-Qur'an Hadis", code: "QH", category: 'Kelompok A (Umum)' },
@@ -33,7 +32,7 @@ export const DEFAULT_FORMULA: FormulaConfig = {
 };
 
 export const DEFAULT_SCHOOL_INFO: SchoolInfo = {
-  name: "Yayasan Miftahul Ihsan Al-Musri",
+  name: "MTs KHUD-NUR",
   nsm: "121232780052",
   npsn: "69983236",
   address: "Komplek Pesantren Cidolog",
