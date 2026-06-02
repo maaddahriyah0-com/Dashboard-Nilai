@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
+// Pastikan base diisi sesuai dengan nama repositori GitHub Anda
 export default defineConfig({
   plugins: [react()],
-  base: '/Dashboard-Nilai/'
+  base: '/Dashboard-Nilai/', 
 })
