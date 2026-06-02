@@ -155,7 +155,7 @@ currentY += 5;
   
   doc.setFont('times', 'normal');
   doc.setFontSize(10);
-  doc.text(`NSM: ${schoolInfo.nsm}   |   NPSN: ${schoolInfo.npsn}`, 105, currentY, { align: 'center' });
+doc.text(`NSM: ${schoolInfo.nsm}   |   NPSN: ${schoolInfo.npsn}`, 105, currentY, { align: 'center'
   currentY += 5;
   
   doc.text(`Alamat: ${schoolInfo.address}, Kec. ${schoolInfo.subdistrict}, ${schoolInfo.city}, Prov. ${schoolInfo.province}`, 105, currentY, { align: 'center' });
