@@ -143,7 +143,7 @@ export const exportIndividualPDF = (
   const xLeft = 14;
   let currentY = 15;
 
-// Header Madrasah (Kop Surat)
+  // Header Madrasah (Kop Surat)
   doc.setFont('times', 'bold');
   doc.setFontSize(14);
   doc.text("YAYASAN PONDOK PESANTREN MIFTAHUL IHSAN AL-MUSRI", 105, currentY, { align: 'center' });
