@@ -146,7 +146,7 @@ export const exportIndividualPDF = (
   // Header Madrasah (Kop Surat)
   doc.setFont('times', 'bold');
   doc.setFontSize(14);
-  doc.text("YAYASAN KHUDNUR BULULAWANG", 105, currentY, { align: 'center' });
+  doc.text("YAYASAN PONDOK PESNTREN MIFTAHUL IHSAN AL-MUSRI", 105, currentY, { align: 'center' });
   currentY += 6;
   
   doc.setFontSize(16);
