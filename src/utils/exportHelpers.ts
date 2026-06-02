@@ -175,7 +175,7 @@ export const exportIndividualPDF = (
   currentY += 5;
   doc.setFontSize(10);
   doc.setFont('times', 'normal');
-  doc.text("Nomor: MTs.K/04.09/PP.01.1/045/2026", 105, currentY, { align: 'center' });
+  doc.text("Nomor: 138/MTs.10.23.052/PP.01.1/6/2026", 105, currentY, { align: 'center' });
   currentY += 12;
 
   // Student details block (Biodata)
@@ -269,7 +269,7 @@ export const exportIndividualPDF = (
   const signatureX = 130;
   
   // Date of signature (usually release of certificate)
-  doc.text(`Malang, ${formatDateID("2026-06-01")}`, signatureX, currentY);
+  doc.text(`Tasikmalaya, ${formatDateID("2026-06-02")}`, signatureX, currentY);
   currentY += 5;
   
   doc.text("Kepala Madrasah,", signatureX, currentY);
