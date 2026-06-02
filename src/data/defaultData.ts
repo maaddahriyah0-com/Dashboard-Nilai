@@ -33,7 +33,7 @@ export const DEFAULT_FORMULA: FormulaConfig = {
 };
 
 export const DEFAULT_SCHOOL_INFO: SchoolInfo = {
-  name: "MTs KHUD-NUR",
+  name: "Yayasan Miftahul Ihsan Al-Musri",
   nsm: "121232780052",
   npsn: "69983236",
   address: "Komplek Pesantren Cidolog",
