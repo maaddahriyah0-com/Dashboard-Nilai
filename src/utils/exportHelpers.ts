@@ -144,19 +144,18 @@ export const exportIndividualPDF = (
   let currentY = 15;
 
 // Header Madrasah (Kop Surat)
-doc.setFont('times', 'bold');
-doc.setFontSize(14);
-doc.text("YAYASAN PONDOK PESANTREN MIFTAHUL IHSAN AL-MUSRI", 105, currentY, { align: 'center' }); // Ketik Nama Yayasan Anda di sini
-currentY += 6;
-
-doc.setFontSize(16);
-doc.text(schoolInfo.name.toUpperCase(), 105, currentY, { align: 'center' }); // Nama Madrasah otomatis dari pengaturan
-currentY += 5;
+  doc.setFont('times', 'bold');
+  doc.setFontSize(14);
+  doc.text("YAYASAN PONDOK PESANTREN MIFTAHUL IHSAN AL-MUSRI", 105, currentY, { align: 'center' });
+  currentY += 6;
+  
+  doc.setFontSize(16);
+  doc.text(schoolInfo.name.toUpperCase(), 105, currentY, { align: 'center' });
+  currentY += 5;
   
   doc.setFont('times', 'normal');
   doc.setFontSize(10);
-  
-  doc.text(`NSM: ${schoolInfo.nsm}   |   NPSN: ${schoolInfo.npsn}`, 105, currentY, { align: 'center'});
+  doc.text(`NSM: ${schoolInfo.nsm}   |   NPSN: ${schoolInfo.npsn}`, 105, currentY, { align: 'center' });
   currentY += 5;
   
   doc.text(`Alamat: ${schoolInfo.address}, Kec. ${schoolInfo.subdistrict}, ${schoolInfo.city}, Prov. ${schoolInfo.province}`, 105, currentY, { align: 'center' });
