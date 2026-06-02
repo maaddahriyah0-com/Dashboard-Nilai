@@ -47,6 +47,11 @@ export const DEFAULT_SCHOOL_INFO: SchoolInfo = {
 // Generates uniform mock grades for setup testing
 const generateMockGrades = (baseScore: number): Record<string, any> => {
   const grades: Record<string, any> = {};
+  
+  // Proteksi: Berikan nilai cadangan (fallback) jika objek DEFAULT_FORMULA belum siap dimuat
+  const weightRapor = DEFAULT_FORMULA?.weightRapor ?? 0.6;
+  const weightUM = DEFAULT_FORMULA?.weightUM ?? 0.4;
+
   DEFAULT_SUBJECTS.forEach((sub, idx) => {
     // Generate slight variations based on index to make charts interesting
     const offset = (idx % 3) - 1; // -1, 0, or 1
@@ -59,9 +64,16 @@ const generateMockGrades = (baseScore: number): Record<string, any> => {
     ];
     const um = Math.min(100, Math.max(60, baseScore + offset * 3 + Math.floor(Math.random() * 6)));
     const rataRapor = Math.round((rapor.reduce((a, b) => a + b, 0) / 5) * 100) / 100;
-    const nilaiIjazah = Math.round((rataRapor * DEFAULT_FORMULA.weightRapor + um * DEFAULT_FORMULA.weightUM) * 100) / 100;
+    
+    // Perhitungan menggunakan variabel lokal aman yang bebas dari potensi NaN
+    const kalkulasiIjazah = Math.round((rataRapor * weightRapor + um * weightUM) * 100) / 100;
 
-    grades[sub.id] = { rapor, um, rataRapor, nilaiIjazah };
+    grades[sub.id] = { 
+      rapor, 
+      um, 
+      rataRapor, 
+      nilaiIjazah: isNaN(kalkulasiIjazah) ? 0 : kalkulasiIjazah // Mencegah crash akibat nilai NaN masuk ke komponen UI/Grafik
+    };
   });
   return grades;
 };
