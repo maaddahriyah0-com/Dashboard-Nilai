@@ -17,10 +17,13 @@ export const exportToExcel = (
 
   // ----- SHEET 1: LEDGER SKOR INDIVIDU -----
   // Prepare row matrix
+  const schoolName = schoolInfo?.name ? schoolInfo.name.toUpperCase() : "NAMA MADRASAH BELUM DIATUR";
+  const schoolAddress = `Alamat: ${schoolInfo?.address ?? ''}, Kec. ${schoolInfo?.subdistrict ?? ''}, ${schoolInfo?.city ?? ''}`;
+
   const matrixData: any[][] = [
-    [schoolInfo.name.toUpperCase()],
+    [schoolName],
     [`DAFTAR NILAI IJAZAH - TAHUN PELAJARAN 2025/2026`],
-    [`Alamat: ${schoolInfo.address}, ${schoolInfo.subdistrict}, ${schoolInfo.city}`],
+    [schoolAddress],
     [], // empty spacer
   ];
 
@@ -123,8 +126,8 @@ export const exportToExcel = (
   XLSX.utils.book_append_sheet(wb, wsStats, "Statistik Mapel");
 
   // Write and Save
-  XLSX.writeFile(wb, `Ledger_Nilai_Ijazah_${schoolInfo.name.replace(/\s+/g, '_')}_2026.xlsx`);
-};
+  const safeSchoolName = (schoolInfo?.name ?? 'Madrasah').replace(/\s+/g, '_');
+XLSX.writeFile(wb, `Ledger_Nilai_Ijazah_${safeSchoolName}_2026.xlsx`);
 
 /**
  * Generates and downloads a gorgeous official individual PDF summary/transcript for a student
@@ -309,12 +312,17 @@ export const exportIndividualPDF = (
 /**
  * Basic mapper to convert YYYY-MM-DD into Indonesian formatted date: e.g. "12 April 2011"
  */
-const formatDateID = (dateStr: string): string => {
+const formatDateID = (dateStr: any): string => {
   if (!dateStr) return '';
-  const months = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-  ];
+  
+  // Jika input berupa objek Date, konversi dulu ke string YYYY-MM-DD
+  if (dateStr instanceof Date) {
+    dateStr = dateStr.toISOString().split('T')[0];
+  }
+  
+  if (typeof dateStr !== 'string') return String(dateStr);
+
+  const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
   try {
     const parts = dateStr.split('-');
     if (parts.length === 3) {
@@ -324,7 +332,7 @@ const formatDateID = (dateStr: string): string => {
       return `${day} ${months[monthIdx]} ${year}`;
     }
   } catch (e) {
-    // return raw
+    console.error(e);
   }
   return dateStr;
 };
