@@ -7,12 +7,19 @@ import { getStudentStats, getSubjectStatsList } from './calculations';
 /**
  * Generates and downloads a complete Excel Ledger for MTs KHUDNUR
  */
-export const exportToExcel = (
-  students: Student[],
-  subjects: Subject[],
-  formula: FormulaConfig,
-  schoolInfo: SchoolInfo
-) => {
+export const exportToExcel = (students: any[], schoolInfo: any) => {
+  // 1. Amankan string Nama dan Alamat Sekolah dari nilai null/undefined
+  const schoolName = schoolInfo?.name ? String(schoolInfo.name).toUpperCase() : "NAMA MADRASAH BELUM DIATUR";
+  const schoolAddress = `Alamat: ${schoolInfo?.address ?? ''}, Kec. ${schoolInfo?.subdistrict ?? ''}, ${schoolInfo?.city ?? ''}`;
+
+  // 2. Susun matriks baris judul Excel
+  const matrixData: any[][] = [
+    [schoolName],
+    [`DAFTAR NILAI IJAZAH - TAHUN PELAJARAN 2025/2026`],
+    [schoolAddress],
+    [],
+  ];
+
   const wb = XLSX.utils.book_new();
 
   // ----- SHEET 1: LEDGER SKOR INDIVIDU -----
