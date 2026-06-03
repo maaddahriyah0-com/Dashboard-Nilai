@@ -7,7 +7,7 @@ import { getStudentStats, getSubjectStatsList } from './calculations';
 /**
  * Generates and downloads a complete Excel Ledger for MTs KHUDNUR
  */
-export const exportToExcel = (students: any[], schoolInfo: any) => {
+export const exportToExcel = (students: any[], subjects: any[], formula: any, schoolInfo: any) => {
   // 1. Amankan string Nama dan Alamat Sekolah dari nilai null/undefined
   const schoolName = schoolInfo?.name ? String(schoolInfo.name).toUpperCase() : "NAMA MADRASAH BELUM DIATUR";
   const schoolAddress = `Alamat: ${schoolInfo?.address ?? ''}, Kec. ${schoolInfo?.subdistrict ?? ''}, ${schoolInfo?.city ?? ''}`;
@@ -17,23 +17,12 @@ export const exportToExcel = (students: any[], schoolInfo: any) => {
     [schoolName],
     [`DAFTAR NILAI IJAZAH - TAHUN PELAJARAN 2025/2026`],
     [schoolAddress],
-    [],
+    [], // empty spacer
   ];
 
   const wb = XLSX.utils.book_new();
 
   // ----- SHEET 1: LEDGER SKOR INDIVIDU -----
-  // Prepare row matrix
-  const schoolName = schoolInfo?.name ? schoolInfo.name.toUpperCase() : "NAMA MADRASAH BELUM DIATUR";
-  const schoolAddress = `Alamat: ${schoolInfo?.address ?? ''}, Kec. ${schoolInfo?.subdistrict ?? ''}, ${schoolInfo?.city ?? ''}`;
-
-  const matrixData: any[][] = [
-    [schoolName],
-    [`DAFTAR NILAI IJAZAH - TAHUN PELAJARAN 2025/2026`],
-    [schoolAddress],
-    [], // empty spacer
-  ];
-
   // Subject codes subheaders
   const headers = [
     "No",
@@ -41,9 +30,9 @@ export const exportToExcel = (students: any[], schoolInfo: any) => {
     "NISN",
     "Nama Siswa",
     "L/P",
-    ...subjects.map(s => `${s.name} (Rapor)`),
-    ...subjects.map(s => `${s.name} (UM)`),
-    ...subjects.map(s => `${s.name} (Akhir)`),
+    ...(subjects || []).map(s => `${s.name} (Rapor)`),
+    ...(subjects || []).map(s => `${s.name} (UM)`),
+    ...(subjects || []).map(s => `${s.name} (Akhir)`),
     "Rerata Rapor (Sem 1-5)",
     "Rerata Ujian Madrasah",
     "Rangkuman Akhir Ijazah",
@@ -62,11 +51,11 @@ export const exportToExcel = (students: any[], schoolInfo: any) => {
       student.nama,
       student.gender,
       // 1. Rapor Averages for each subject
-      ...subjects.map(s => student.grades[s.id]?.rataRapor ?? 0),
+      ...(subjects || []).map(s => student.grades?.[s.id]?.rataRapor ?? 0),
       // 2. UM grades for each subject
-      ...subjects.map(s => student.grades[s.id]?.um ?? 0),
+      ...(subjects || []).map(s => student.grades?.[s.id]?.um ?? 0),
       // 3. Final weighted grades for each subject
-      ...subjects.map(s => student.grades[s.id]?.nilaiIjazah ?? 0),
+      ...(subjects || []).map(s => student.grades?.[s.id]?.nilaiIjazah ?? 0),
       stats.averageRapor,
       stats.averageUM,
       stats.averageIjazah,
@@ -85,8 +74,9 @@ export const exportToExcel = (students: any[], schoolInfo: any) => {
     { wch: 25 }, // Nama
     { wch: 6 },  // L/P
   ];
+  
   // populate default widths for subjects
-  for (let i = 0; i < subjects.length * 3; i++) {
+  for (let i = 0; i < (subjects || []).length * 3; i++) {
     colWidths.push({ wch: 12 });
   }
   colWidths.push({ wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 16 });
@@ -96,8 +86,8 @@ export const exportToExcel = (students: any[], schoolInfo: any) => {
 
   // ----- SHEET 2: RINGKASAN & STATISTIK -----
   const statMatrix: any[][] = [
-    [`RINGKASAN STATISTIK MATA PELAJARAN - ${schoolInfo.name}`],
-    [`Kriteria Ketuntasan Minimal (KKM): ${formula.kkm}`],
+    [`RINGKASAN STATISTIK MATA PELAJARAN - ${schoolName}`],
+    [`Kriteria Ketuntasan Minimal (KKM): ${formula?.kkm ?? 0}`],
     [],
     ["No", "Kode Mapel", "Nama Mata Pelajaran", "Rata-rata Rapor", "Rata-rata UM", "Rata-rata Nilai Ijazah", "Nilai Tertinggi", "Nilai Terendah", "Persentase Kelulusan"]
   ];
@@ -134,7 +124,8 @@ export const exportToExcel = (students: any[], schoolInfo: any) => {
 
   // Write and Save
   const safeSchoolName = (schoolInfo?.name ?? 'Madrasah').replace(/\s+/g, '_');
-XLSX.writeFile(wb, `Ledger_Nilai_Ijazah_${safeSchoolName}_2026.xlsx`);
+  XLSX.writeFile(wb, `Ledger_Nilai_Ijazah_${safeSchoolName}_2026.xlsx`);
+};
 
 /**
  * Generates and downloads a gorgeous official individual PDF summary/transcript for a student
@@ -145,11 +136,9 @@ export const exportIndividualPDF = (
   formula: FormulaConfig,
   schoolInfo: SchoolInfo
 ) => {
-  // Use portrait A4 (default)
   const doc = new jsPDF();
   const stats = getStudentStats(student, subjects, formula);
 
-  // Define margins and text color
   const xLeft = 14;
   let currentY = 15;
 
@@ -160,25 +149,23 @@ export const exportIndividualPDF = (
   currentY += 6;
   
   doc.setFontSize(16);
-  doc.text(schoolInfo.name.toUpperCase(), 105, currentY, { align: 'center' });
+  doc.text((schoolInfo?.name || "NAMA MADRASAH").toUpperCase(), 105, currentY, { align: 'center' });
   currentY += 5;
   
   doc.setFont('times', 'normal');
   doc.setFontSize(10);
-  doc.text("NSM: " + schoolInfo.nsm + "   |   NPSN: " + schoolInfo.npsn, 105, currentY, { align: 'center' });
+  doc.text("NSM: " + (schoolInfo?.nsm ?? "-") + "   |   NPSN: " + (schoolInfo?.npsn ?? "-"), 105, currentY, { align: 'center' });
   currentY += 5;
   
-  doc.text("Alamat: " + schoolInfo.address + ", Kec. " + schoolInfo.subdistrict + ", " + schoolInfo.city + ", Prov. " + schoolInfo.province, 105, currentY, { align: 'center' });
+  doc.text("Alamat: " + (schoolInfo?.address ?? "") + ", Kec. " + (schoolInfo?.subdistrict ?? "") + ", " + (schoolInfo?.city ?? "") + ", Prov. " + (schoolInfo?.province ?? ""), 105, currentY, { align: 'center' });
   currentY += 4;
   
-  // Double horizontal border lines
   doc.setLineWidth(1);
   doc.line(14, currentY, 196, currentY);
   doc.setLineWidth(0.3);
   doc.line(14, currentY + 1, 196, currentY + 1);
   currentY += 10;
 
-  // Title of the template document
   doc.setFont('times', 'bold');
   doc.setFontSize(13);
   doc.text("SURAT KETERANGAN TRANSKRIP NILAI IJAZAH", 105, currentY, { align: 'center' });
@@ -188,7 +175,6 @@ export const exportIndividualPDF = (
   doc.text("Nomor: 138/MTs.10.23.052/PP.01.1/6/2026", 105, currentY, { align: 'center' });
   currentY += 12;
 
-  // Student details block (Biodata)
   doc.setFont('times', 'bold');
   doc.text("KETERANGAN IDENTITAS SISWA", xLeft, currentY);
   currentY += 5;
@@ -209,20 +195,15 @@ export const exportIndividualPDF = (
   });
   currentY += 6;
 
-  // Score Table block
   doc.setFont('times', 'bold');
   doc.text("DAFTAR NILAI AKADEMIS", xLeft, currentY);
   currentY += 3;
 
-  // Let's create subjects mapping rows
   const tableRows: any[] = [];
-  
-  // Track categories
   const categories = ['Kelompok A (Umum)', 'Kelompok B (Umum)', 'Muatan Lokal'];
   let orderNo = 1;
 
   categories.forEach(cat => {
-    // Add sub-header for category
     tableRows.push([
       { content: cat.toUpperCase(), colSpan: 5, styles: { fontStyle: 'bold', fillColor: [241, 245, 249] } }
     ]);
@@ -240,7 +221,6 @@ export const exportIndividualPDF = (
     });
   });
 
-  // Append aggregate totals row
   tableRows.push([
     { content: "RATA-RATA KUMULATIF", colSpan: 2, styles: { fontStyle: 'bold', halign: 'right' } },
     stats.averageRapor.toFixed(2),
@@ -267,53 +247,48 @@ export const exportIndividualPDF = (
     }
   });
 
-  // Guarantee enough layout height for signature block (otherwise add new page)
   if (currentY > 230) {
     doc.addPage();
     currentY = 25;
   }
 
-  // Legal signing block (Tanda Tangan Kepala Madrasah)
   doc.setFont('times', 'normal');
   doc.setFontSize(10);
   const signatureX = 130;
   
-  // Date of signature (usually release of certificate)
   doc.text(`Tasikmalaya, ${formatDateID("2026-06-02")}`, signatureX, currentY);
   currentY += 5;
   
   doc.text("Kepala Madrasah,", signatureX, currentY);
-  
-  // Adding stamp or signing location
-  currentY += 28; // height for real signatures
+  currentY += 28;
   
   doc.setFont('times', 'bold');
-  doc.text(schoolInfo.headmaster, signatureX, currentY);
+  doc.text(schoolInfo?.headmaster || "-", signatureX, currentY);
   
   doc.setLineWidth(0.2);
   doc.line(signatureX, currentY + 0.5, signatureX + 55, currentY + 0.5);
   currentY += 5;
   
   doc.setFont('times', 'normal');
-  doc.text(`NIP. ${schoolInfo.headmasterNip}`, signatureX, currentY);
+  doc.text(`NIP. ${schoolInfo?.headmasterNip || "-"}`, signatureX, currentY);
 
-  // Status and KKM stamp at the lower left
   doc.rect(xLeft, currentY - 24, 60, 22);
   doc.setFont('times', 'bold');
   doc.text("KETERANGAN KKM:", xLeft + 3, currentY - 20);
   doc.setFont('times', 'normal');
-  doc.text(`Batas Minimum (KKM) : ${formula.kkm}`, xLeft + 3, currentY - 15);
+  doc.text(`Batas Minimum (KKM) : ${formula?.kkm ?? 0}`, xLeft + 3, currentY - 15);
   doc.setFont('times', 'bold');
   if (stats.isPassed) {
-    doc.setTextColor(22, 101, 52); // green-800
+    doc.setTextColor(22, 101, 52);
     doc.text("STATUS: LULUS", xLeft + 3, currentY - 8);
   } else {
-    doc.setTextColor(153, 27, 27); // red-800
+    doc.setTextColor(153, 27, 27);
     doc.text(`STATUS: REMEDIAL (${stats.failedSubjectsCount} Mapel)`, xLeft + 3, currentY - 8);
   }
-  doc.setTextColor(0); // reset color
+  doc.setTextColor(0);
 
-  doc.save(`SKL_${student.nama.replace(/\s+/g, '_')}_${student.nis}.pdf`);
+  const safePdfName = (student?.nama ?? 'Siswa').replace(/\s+/g, '_');
+  doc.save(`SKL_${safePdfName}_${student?.nis ?? 'Data'}.pdf`);
 };
 
 /**
@@ -321,12 +296,9 @@ export const exportIndividualPDF = (
  */
 const formatDateID = (dateStr: any): string => {
   if (!dateStr) return '';
-  
-  // Jika input berupa objek Date, konversi dulu ke string YYYY-MM-DD
   if (dateStr instanceof Date) {
     dateStr = dateStr.toISOString().split('T')[0];
   }
-  
   if (typeof dateStr !== 'string') return String(dateStr);
 
   const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -349,7 +321,6 @@ const formatDateID = (dateStr: any): string => {
  */
 export const downloadStudentTemplate = () => {
   const wb = XLSX.utils.book_new();
-  
   const headers = ["No", "NIS", "NISN", "Nama Siswa", "L/P", "Kelas"];
   const sampleData = [
     [1, "202307006", "0105432101", "Budi Santoso", "L", "9-A"],
@@ -367,15 +338,7 @@ export const downloadStudentTemplate = () => {
   ];
   
   const ws = XLSX.utils.aoa_to_sheet(matrix);
-  
-  ws['!cols'] = [
-    { wch: 6 },  // No
-    { wch: 15 }, // NIS
-    { wch: 15 }, // NISN
-    { wch: 25 }, // Nama Siswa
-    { wch: 8 },  // L/P
-    { wch: 10 }  // Kelas
-  ];
+  ws['!cols'] = [{ wch: 6 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 8 }, { wch: 10 }];
   
   XLSX.utils.book_append_sheet(wb, ws, "Siswa Baru");
   XLSX.writeFile(wb, "Template_Tambah_Siswa_Baru.xlsx");
@@ -386,7 +349,6 @@ export const downloadStudentTemplate = () => {
  */
 export const downloadGradesTemplate = (students: Student[], subjects: Subject[]) => {
   const wb = XLSX.utils.book_new();
-  
   const headers = [
     "No",
     "NIS",
@@ -394,43 +356,23 @@ export const downloadGradesTemplate = (students: Student[], subjects: Subject[])
     "Nama Siswa",
     "L/P",
     "Kelas",
-    ...subjects.flatMap(s => [`${s.name} (Rapor)`, `${s.name} (UM)`])
+    ...(subjects || []).flatMap(s => [`${s.name} (Rapor)`, `${s.name} (UM)`])
   ];
   
   const rowsData: any[][] = [];
-  
   if (students && students.length > 0) {
     students.forEach((std, idx) => {
-      const studentGradesRow: any[] = [
-        idx + 1,
-        std.nis,
-        std.nisn,
-        std.nama,
-        std.gender,
-        std.kelas
-      ];
-      
-      subjects.forEach(sub => {
+      const studentGradesRow: any[] = [idx + 1, std.nis, std.nisn, std.nama, std.gender, std.kelas];
+      (subjects || []).forEach(sub => {
         const studentGrades = std.grades[sub.id] || { rataRapor: 80, um: 80 };
         studentGradesRow.push(studentGrades.rataRapor || 0);
-        studentGradesRow.push(studentGrades.um || 50); // Using 50 or other standard minimum or current
+        studentGradesRow.push(studentGrades.um || 50);
       });
-      
       rowsData.push(studentGradesRow);
     });
   } else {
-    // Fallback sample data row if no students are loaded yet
-    const sampleRow = [
-      1,
-      "202307001",
-      "0102345678",
-      "Ahmad Fauzi",
-      "L",
-      "9-A"
-    ];
-    subjects.forEach(() => {
-      sampleRow.push(80, 85);
-    });
+    const sampleRow = [1, "202307001", "0102345678", "Ahmad Fauzi", "L", "9-A"];
+    (subjects || []).forEach(() => { sampleRow.push(80, 85); });
     rowsData.push(sampleRow);
   }
   
@@ -443,21 +385,10 @@ export const downloadGradesTemplate = (students: Student[], subjects: Subject[])
   ];
   
   const ws = XLSX.utils.aoa_to_sheet(matrix);
-  
-  const colWidths = [
-    { wch: 6 },  // No
-    { wch: 15 }, // NIS
-    { wch: 15 }, // NISN
-    { wch: 25 }, // Nama Siswa
-    { wch: 8 },  // L/P
-    { wch: 10 }  // Kelas
-  ];
-  subjects.forEach(() => {
-    colWidths.push({ wch: 22 }, { wch: 22 });
-  });
+  const colWidths = [{ wch: 6 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 8 }, { wch: 10 }];
+  (subjects || []).forEach(() => { colWidths.push({ wch: 22 }, { wch: 22 }); });
   ws['!cols'] = colWidths;
   
   XLSX.utils.book_append_sheet(wb, ws, "Unggah Nilai");
   XLSX.writeFile(wb, "Template_Unggah_Nilai.xlsx");
 };
-
